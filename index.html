@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WMNY EXAM PREP - Municipal Workforce</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --blue: #0c4add;
+            --white: #ffffff;
+            --frame-bg: #121418;
+            --frame-text: #8c8e93;
+            --line-light: rgba(255, 255, 255, 0.25);
+            --line-dark: rgba(255, 255, 255, 0.1);
+            --font-sans: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--frame-bg);
+            color: var(--white);
+            font-family: var(--font-sans);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 1.5rem;
+        }
+
+        .system-frame {
+            width: 100%;
+            max-width: 1600px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .frame-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--frame-text);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .core-interface {
+            flex-grow: 1;
+            background-color: var(--blue);
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .reg-mark { position: absolute; width: 15px; height: 15px; pointer-events: none; z-index: 10; }
+        .reg-mark::before, .reg-mark::after { content: ''; position: absolute; background-color: var(--white); }
+        .reg-mark::before { width: 100%; height: 1px; top: 7px; left: 0; }
+        .reg-mark::after { width: 1px; height: 100%; top: 0; left: 7px; }
+        .reg-tl { top: 1rem; left: 1rem; }
+        .reg-tr { top: 1rem; right: 1rem; }
+        .reg-bl { bottom: 1rem; left: 1rem; }
+        .reg-br { bottom: 1rem; right: 1rem; }
+
+        .micro-label {
+            position: absolute;
+            font-family: var(--font-mono);
+            font-size: 0.45rem;
+            text-transform: uppercase;
+            color: var(--line-light);
+            letter-spacing: 0.05em;
+        }
+        .ml-1 { top: 2rem; left: 25%; }
+        .ml-2 { top: 2rem; left: 50%; }
+        .ml-3 { top: 2rem; left: 75%; }
+        .ml-4 { bottom: 2rem; left: 25%; }
+        .ml-5 { bottom: 2rem; left: 75%; }
+
+        .top-nav {
+            display: grid;
+            grid-template-columns: 300px 1fr auto;
+            border-bottom: 1px solid var(--line-light);
+            padding: 3rem 4rem 2rem 4rem;
+            align-items: end;
+        }
+
+        .brand-lockup { display: flex; align-items: center; gap: 1rem; cursor: pointer; }
+        .brand-logo { width: 48px; height: 48px; }
+        .brand-text { font-size: 1.5rem; font-weight: 700; line-height: 0.9; letter-spacing: -0.03em; }
+
+        .nav-links { display: flex; gap: 3rem; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.02em; }
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+        .nav-links a:hover { opacity: 1; }
+        .nav-links a.active { opacity: 1; border-bottom: 1px solid white; padding-bottom: 2px; }
+
+        .sys-status { font-family: var(--font-mono); font-size: 0.7rem; color: var(--line-light); display: flex; flex-direction: column; gap: 0.25rem; }
+
+        /* ── HOME PAGE ── */
+        .hero-section {
+            padding: 0 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            border-bottom: 1px solid var(--line-light);
+        }
+        .hero-left {
+            padding: 4rem 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid var(--line-light);
+            padding-right: 4rem;
+        }
+        .hero-desc { font-size: 1.1rem; line-height: 1.4; max-width: 80%; }
+        .striped-heading { display: flex; flex-direction: column; padding: 2rem 0 2rem 4rem; }
+        .striped-heading span {
+            font-size: clamp(3rem, 6vw, 7rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--line-light);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .striped-heading span:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+        .docket-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            border-right: 1px solid var(--line-light);
+            padding: 2rem 4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            overflow-y: auto;
+        }
+
+        .filter-group-title {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--line-light);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--line-dark);
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+        .filter-item { display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; font-weight: 500; cursor: pointer; user-select: none; }
+        .filter-box { width: 14px; height: 14px; border: 1px solid var(--white); display: inline-block; flex-shrink: 0; transition: background 0.15s; }
+        .filter-item.active .filter-box { background-color: var(--white); }
+
+        .data-panel { display: flex; flex-direction: column; overflow-y: auto; }
+
+        .data-header {
+            display: grid;
+            grid-template-columns: 100px 100px 1fr 150px 150px;
+            padding: 1rem 4rem;
+            border-bottom: 1px solid var(--line-light);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--line-light);
+            position: sticky;
+            top: 0;
+            background-color: var(--blue);
+            z-index: 5;
+        }
+
+        .search-bar-wrap {
+            padding: 1rem 4rem;
+            border-bottom: 1px solid var(--line-dark);
+            background: var(--blue);
+            position: sticky;
+            top: 0;
+            z-index: 6;
+        }
+        .search-bar-wrap input {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            padding: 0.6rem 1rem;
+            outline: none;
+            letter-spacing: 0.05em;
+        }
+        .search-bar-wrap input::placeholder { color: rgba(255,255,255,0.3); }
+        .search-bar-wrap input:focus { border-color: rgba(255,255,255,0.5); }
+
+        .data-row {
+            display: grid;
+            grid-template-columns: 100px 100px 1fr 150px 150px;
+            padding: 1.25rem 4rem;
+            border-bottom: 1px solid var(--line-dark);
+            align-items: center;
+            font-size: 0.9rem;
+            transition: all 0.1s ease;
+            text-decoration: none;
+            color: var(--white);
+            cursor: pointer;
+        }
+        .data-row:hover { background-color: var(--white); color: var(--blue); }
+        .data-row:hover .mono-data { color: var(--blue); }
+        .data-row.hidden { display: none; }
+
+        .mono-data { font-family: var(--font-mono); font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+        .exam-title { font-weight: 700; letter-spacing: -0.01em; }
+        .action-btn { border: 1px solid currentColor; padding: 0.4rem 0.8rem; font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; text-align: center; }
+
+        /* ── INNER PAGES (shared shell) ── */
+        .page { display: none; flex-direction: column; flex-grow: 1; overflow: hidden; }
+        .page.active { display: flex; }
+
+        .page-header {
+            padding: 2rem 4rem;
+            border-bottom: 1px solid var(--line-light);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+        .page-header h2 {
+            font-size: clamp(1.5rem, 4vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .page-sys { font-family: var(--font-mono); font-size: 0.6rem; color: var(--line-light); text-align: right; display: flex; flex-direction: column; gap: 4px; }
+
+        .page-body { flex-grow: 1; overflow-y: auto; padding: 2rem 4rem; }
+
+        /* ── EXAM DETAIL ── */
+        .exam-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .detail-block { border: 1px solid var(--line-dark); padding: 1.5rem; }
+        .detail-block h3 { font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--line-light); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--line-dark); }
+        .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--line-dark); font-size: 0.82rem; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
+        .detail-value { font-weight: 500; }
+        .detail-value.mono { font-family: var(--font-mono); font-size: 0.72rem; }
+        .topic-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+        .topic-list li { display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; }
+        .topic-list li::before { content: ''; display: inline-block; width: 6px; height: 6px; border: 1px solid rgba(255,255,255,0.5); flex-shrink: 0; }
+        .exam-cta-row { display: flex; gap: 1rem; margin-top: 2rem; }
+        .btn-primary { background: white; color: var(--blue); border: none; padding: 0.85rem 2rem; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; font-weight: 700; transition: opacity 0.15s; }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-secondary { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.4); padding: 0.85rem 2rem; font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: border-color 0.15s; }
+        .btn-secondary:hover { border-color: white; }
+        .back-btn { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); cursor: pointer; border: 1px solid rgba(255,255,255,0.2); padding: 0.3rem 0.8rem; background: transparent; color: white; transition: border-color 0.15s; }
+        .back-btn:hover { border-color: white; }
+        .status-pill { display: inline-block; font-family: var(--font-mono); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.2rem 0.6rem; border: 1px solid rgba(255,255,255,0.4); }
+        .status-pill.open { border-color: #4ade80; color: #4ade80; }
+        .status-pill.continuous { border-color: #facc15; color: #facc15; }
+
+        /* ── STUDY MODULES ── */
+        .modules-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1px; background: rgba(255,255,255,0.1); }
+        .module-card { background: var(--blue); padding: 1.75rem; cursor: pointer; transition: background 0.1s; }
+        .module-card:hover { background: rgba(255,255,255,0.08); }
+        .module-agency { font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 0.75rem; }
+        .module-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+        .module-meta { font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-bottom: 1.25rem; line-height: 1.5; }
+        .module-stats { display: flex; gap: 1.5rem; margin-bottom: 1.25rem; }
+        .module-stat { display: flex; flex-direction: column; gap: 2px; }
+        .module-stat-val { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; }
+        .module-stat-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; }
+        .module-bar { height: 2px; background: rgba(255,255,255,0.15); position: relative; margin-bottom: 1rem; }
+        .module-bar-fill { position: absolute; top: 0; left: 0; height: 100%; background: white; }
+        .module-progress-label { font-family: var(--font-mono); font-size: 0.55rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; }
+
+        /* ── PRICING ── */
+        .pricing-toggle-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+        .pricing-toggle-label { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); }
+        .toggle-track { width: 36px; height: 20px; background: rgba(255,255,255,0.15); border-radius: 10px; position: relative; cursor: pointer; transition: background 0.2s; }
+        .toggle-track.on { background: #4ade80; }
+        .toggle-thumb { position: absolute; width: 14px; height: 14px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: left 0.2s; }
+        .toggle-track.on .toggle-thumb { left: 19px; }
+        .save-badge { background: rgba(74,222,128,0.15); color: #4ade80; font-family: var(--font-mono); font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.2rem 0.5rem; }
+
+        .pricing-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem; }
+        .pricing-card { background: #0a3bc4; padding: 1.75rem 1.5rem; }
+        .pricing-card.featured { background: rgba(255,255,255,0.12); }
+        .pricing-badge { font-family: var(--font-mono); font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.25rem 0.6rem; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); display: inline-block; margin-bottom: 1rem; }
+        .pricing-plan { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+        .pricing-amount { font-size: 3rem; font-weight: 900; letter-spacing: -0.04em; line-height: 1; }
+        .pricing-unit { font-family: var(--font-mono); font-size: 0.65rem; color: rgba(255,255,255,0.5); margin-bottom: 0.25rem; }
+        .pricing-note { font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-bottom: 1.5rem; min-height: 1rem; }
+        .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 1.5rem; }
+        .pricing-feature { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.78rem; color: rgba(255,255,255,0.8); line-height: 1.4; }
+        .feat-yes { color: #4ade80; font-size: 0.75rem; flex-shrink: 0; margin-top: 1px; }
+        .feat-no { color: rgba(255,255,255,0.2); font-size: 0.75rem; flex-shrink: 0; margin-top: 1px; }
+        .pricing-cta { width: 100%; padding: 0.75rem; font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; font-weight: 700; border: 1px solid rgba(255,255,255,0.4); background: transparent; color: white; transition: all 0.15s; }
+        .pricing-cta:hover { background: rgba(255,255,255,0.1); }
+        .pricing-card.featured .pricing-cta { background: white; color: var(--blue); border-color: white; }
+        .pricing-card.featured .pricing-cta:hover { opacity: 0.9; }
+
+        .compare-table { width: 100%; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem; border-collapse: collapse; }
+        .compare-table th, .compare-table td { padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.75rem; text-align: left; }
+        .compare-table th { font-family: var(--font-mono); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.04); }
+        .compare-table th.feat-col { color: rgba(255,255,255,0.6); }
+        .compare-table td.yes { color: #4ade80; font-family: var(--font-mono); font-size: 0.7rem; }
+        .compare-table td.no { color: rgba(255,255,255,0.2); }
+        .compare-table td.val { color: rgba(255,255,255,0.7); font-size: 0.72rem; }
+
+        .addons-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); margin-bottom: 2rem; }
+        .addon-card { background: #0a3bc4; padding: 1.5rem; }
+        .addon-title { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.5rem; }
+        .addon-desc { font-size: 0.75rem; color: rgba(255,255,255,0.55); line-height: 1.55; margin-bottom: 1.25rem; }
+        .addon-price { font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; }
+        .addon-price-note { font-family: var(--font-mono); font-size: 0.55rem; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-top: 2px; }
+
+        .faq-list { border: 1px solid rgba(255,255,255,0.1); }
+        .faq-item { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-q { font-size: 0.85rem; font-weight: 500; margin-bottom: 0.4rem; }
+        .faq-a { font-size: 0.75rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+        .section-label { font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.35); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+        /* scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--blue); border-left: 1px solid var(--line-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.6); }
+    </style>
+</head>
+<body>
+<div class="system-frame">
+    <div class="frame-bar">
+        <span>WMNYEXAMPPREP.COM</span>
+        <span>PREMIUM STUDY MATERIALS DEPT</span>
+        <span>SYS.REV.04</span>
+    </div>
+
+    <main class="core-interface">
+        <div class="reg-mark reg-tl"></div>
+        <div class="reg-mark reg-tr"></div>
+        <div class="reg-mark reg-bl"></div>
+        <div class="reg-mark reg-br"></div>
+        <div class="micro-label ml-1">SEC_01_A</div>
+        <div class="micro-label ml-2">PROCURE MATERIAL HERE</div>
+        <div class="micro-label ml-3">SEC_01_B</div>
+        <div class="micro-label ml-4">VALIDATE ELIGIBILITY</div>
+        <div class="micro-label ml-5">SYS_ACTIVE</div>
+
+        <!-- NAV -->
+        <header class="top-nav">
+            <div class="brand-lockup" onclick="showPage('home')">
+                <svg class="brand-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 30 L40 80 L60 80 L30 30 Z" fill="white"></path>
+                    <path d="M40 30 L70 80 L90 80 L60 30 Z" fill="white" fill-opacity="0.9"></path>
+                    <rect x="10" y="20" width="80" height="5" fill="white"></rect>
+                </svg>
+                <div class="brand-text">wmny<br>exam prep.</div>
+            </div>
+            <div class="nav-links">
+                <a onclick="showPage('home')" id="nav-home" class="active">EXAM SCHEDULE</a>
+                <a onclick="showPage('modules')" id="nav-modules">STUDY MODULES</a>
+                <a onclick="showPage('pricing')" id="nav-pricing">PRICING</a>
+                <a onclick="showPage('home')" id="nav-req">REQUIREMENTS</a>
+            </div>
+            <div class="sys-status" style="text-align: right;">
+                <span>PORTAL: ACTIVE</span>
+                <span>NEW YORK CITY</span>
+            </div>
+        </header>
+
+        <!-- ══════════════════════════════════════════ HOME PAGE -->
+        <div id="page-home" class="page active" style="flex-direction:column;">
+            <section class="hero-section">
+                <div class="hero-left">
+                    <div class="sys-status">
+                        <span>DEPT. OF CITYWIDE ADMIN SERVICES</span>
+                        <span>REFERENCE GUIDE</span>
+                        <span>VOL. 24</span>
+                    </div>
+                    <p class="hero-desc">Official preparatory modules and structural data for municipal civil service examinations. Select your agency to procure materials.</p>
+                </div>
+                <div class="striped-heading">
+                    <span>CIVIL SERVICE</span>
+                    <span>EXAMINATION</span>
+                    <span>MATERIALS</span>
+                </div>
+            </section>
+
+            <section class="docket-layout">
+                <aside class="sidebar">
+                    <div>
+                        <div class="filter-group-title">Filter by Agency</div>
+                        <ul class="filter-list" id="agency-filters">
+                            <li class="filter-item active" data-agency="ALL"><span class="filter-box"></span> ALL AGENCIES</li>
+                            <li class="filter-item" data-agency="DSNY"><span class="filter-box"></span> DSNY (Sanitation)</li>
+                            <li class="filter-item" data-agency="FDNY"><span class="filter-box"></span> FDNY (Fire)</li>
+                            <li class="filter-item" data-agency="NYPD"><span class="filter-box"></span> NYPD (Police)</li>
+                            <li class="filter-item" data-agency="DEP"><span class="filter-box"></span> DEP (Environment)</li>
+                            <li class="filter-item" data-agency="DOT"><span class="filter-box"></span> DOT (Transportation)</li>
+                            <li class="filter-item" data-agency="MTA"><span class="filter-box"></span> MTA (Transit)</li>
+                            <li class="filter-item" data-agency="ADMIN"><span class="filter-box"></span> ADMIN (Clerical)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="filter-group-title">Exam Status</div>
+                        <ul class="filter-list" id="status-filters">
+                            <li class="filter-item active" data-status="ALL"><span class="filter-box"></span> All Statuses</li>
+                            <li class="filter-item" data-status="OPEN"><span class="filter-box"></span> Open for Filing</li>
+                            <li class="filter-item" data-status="CONTINUOUS"><span class="filter-box"></span> Continuous</li>
+                            <li class="filter-item" data-status="UPCOMING"><span class="filter-box"></span> Upcoming</li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <div class="data-panel">
+                    <div class="search-bar-wrap">
+                        <input type="text" id="search-input" placeholder="SEARCH EXAM TITLE OR NUMBER...">
+                    </div>
+                    <div class="data-header" style="top:48px;">
+                        <div>EXAM NO.</div>
+                        <div>AGENCY</div>
+                        <div>EXAM TITLE</div>
+                        <div>FILING DEADLINE</div>
+                        <div>ACTION</div>
+                    </div>
+
+                    <div class="data-row" data-agency="DSNY" data-status="OPEN" onclick="showExamDetail('4022','DSNY','Sanitation Worker','2024-06-15','OPEN')">
+                        <div class="mono-data">4022</div>
+                        <div class="mono-data">DSNY</div>
+                        <div class="exam-title">Sanitation Worker</div>
+                        <div class="mono-data">2024-06-15</div>
+                        <div class="action-btn">GET MODULE</div>
+                    </div>
+                    <div class="data-row" data-agency="MTA" data-status="OPEN" onclick="showExamDetail('4061','MTA','Train Operator','2024-06-22','OPEN')">
+                        <div class="mono-data">4061</div>
+                        <div class="mono-data">MTA</div>
+                        <div class="exam-title">Train Operator</div>
+                        <div class="mono-data">2024-06-22</div>
+                        <div class="action-btn">GET MODULE</div>
+                    </div>
+                    <div class="data-row" data-agency="FDNY" data-status="OPEN" onclick="showExamDetail('4310','FDNY','Firefighter (Open Competitive)','2024-07-01','OPEN')">
+                        <div class="mono-data">4310</div>
+                        <div class="mono-data">FDNY</div>
+                        <div class="exam-title">Firefighter (Open Competitive)</div>
+                        <div class="mono-data">2024-07-01</div>
+                        <div class="action-btn">GET MODULE</div>
+                    </div>
+                    <div class="data-row" data-agency="NYPD" data-status="CONTINUOUS" onclick="showExamDetail('4099','NYPD','Police Officer','CONTINUOUS','CONTINUOUS')">
+                        <div class="mono-data">4099</div>
+                        <div class="mono-data">NYPD</div>
+                        <div class="exam-title">Police Officer</div>
+                        <div class="mono-data">CONTINUOUS</div>
+                        <div class="action-btn">GET MODULE</div>
+                    </div>
+                    <div class="data-row" data-agency="DEP" data-status="OPEN" onclick="showExamDetail('5012','DEP','Water Treatment Operator','2024-07-15','OPEN')">
+                        <div class="mono-data">5012</div>
+                        <div class="mono-data">DEP</div>
+                        <div class="exam-title">Water Treatment Operator</div>
+                        <div class="mono-data">2024-07-15</div>
+                        <div class="action-btn">GET MODULE</div>
+                    </div>
+                    <div class="data-row" data-agency="DOT" data-status="UPCOMING" onclick="showExamDetail('5044','DOT','Highway Repairer','2024-08-01','UPCOMING')">
+                        <div class="mono-data">5044</div>
+                        <div class="mono-data">DOT</div>
+                        <div class="exam-title">Highway Repairer</div>
+                        <div class="mono-data">2024-08-01</div>
+                        <div class="action-btn">GET MODULE</div>
+                    </div>
+                    <div class="data-row" data-agency="ADMIN" data-status="UPCOMING" onclick="showExamDetail('6011','ADMIN','Clerical Associate III','2024-08-10','UPCOMING')">
+                        <div class="mono-data">6011</div>
+                        <div class="mono-data">ADMIN</div>
+                        <div class="exam-title">Clerical Associate III</div>
+                        <div class="mono-data">2024-08-10</div>
+                        <div class="action-btn">GET MODULE</div>
+                    </div>
+                    <div id="no-results" style="display:none;padding:2rem 4rem;font-family:var(--font-mono);font-size:0.7rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;">NO MATCHING EXAMS FOUND</div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ══════════════════════════════════════════ EXAM DETAIL PAGE -->
+        <div id="page-detail" class="page">
+            <div class="page-header">
+                <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                    <button class="back-btn" onclick="showPage('home')">← BACK TO EXAMS</button>
+                    <h2 id="detail-title">Exam Title</h2>
+                    <div style="display:flex;align-items:center;gap:1rem;">
+                        <span id="detail-agency-pill" style="font-family:var(--font-mono);font-size:0.7rem;color:rgba(255,255,255,0.5);"></span>
+                        <span id="detail-status-pill" class="status-pill open"></span>
+                    </div>
+                </div>
+                <div class="page-sys">
+                    <span id="detail-exam-no"></span>
+                    <span>DCAS OFFICIAL</span>
+                    <span>NYC CIVIL SERVICE</span>
+                </div>
+            </div>
+            <div class="page-body">
+                <div class="exam-detail-grid">
+                    <div class="detail-block">
+                        <h3>Exam Information</h3>
+                        <div class="detail-row"><span class="detail-label">Exam Number</span><span class="detail-value mono" id="d-num">—</span></div>
+                        <div class="detail-row"><span class="detail-label">Agency</span><span class="detail-value" id="d-agency">—</span></div>
+                        <div class="detail-row"><span class="detail-label">Filing Deadline</span><span class="detail-value mono" id="d-deadline">—</span></div>
+                        <div class="detail-row"><span class="detail-label">Exam Fee</span><span class="detail-value">$68.00</span></div>
+                        <div class="detail-row"><span class="detail-label">Exam Type</span><span class="detail-value">Open Competitive</span></div>
+                        <div class="detail-row"><span class="detail-label">Salary Range</span><span class="detail-value" id="d-salary">—</span></div>
+                        <div class="detail-row"><span class="detail-label">Status</span><span id="d-status-inline" class="detail-value">—</span></div>
+                    </div>
+                    <div class="detail-block">
+                        <h3>Minimum Qualifications</h3>
+                        <div class="detail-row"><span class="detail-label">Education</span><span class="detail-value" id="d-edu">High School Diploma or GED</span></div>
+                        <div class="detail-row"><span class="detail-label">Experience</span><span class="detail-value" id="d-exp">None required</span></div>
+                        <div class="detail-row"><span class="detail-label">License</span><span class="detail-value" id="d-lic">Valid NYS Driver's License</span></div>
+                        <div class="detail-row"><span class="detail-label">Residency</span><span class="detail-value">NYC resident preferred</span></div>
+                        <div class="detail-row"><span class="detail-label">Age</span><span class="detail-value" id="d-age">18+ at time of exam</span></div>
+                    </div>
+                    <div class="detail-block">
+                        <h3>Exam Content Areas</h3>
+                        <ul class="topic-list" id="d-topics"></ul>
+                    </div>
+                    <div class="detail-block">
+                        <h3>Module Contents</h3>
+                        <div class="detail-row"><span class="detail-label">Practice Questions</span><span class="detail-value mono" id="d-qcount">—</span></div>
+                        <div class="detail-row"><span class="detail-label">Timed Exams</span><span class="detail-value mono">Unlimited</span></div>
+                        <div class="detail-row"><span class="detail-label">Study Guides</span><span class="detail-value mono">3 PDF guides</span></div>
+                        <div class="detail-row"><span class="detail-label">Video Walkthroughs</span><span class="detail-value mono" id="d-videos">—</span></div>
+                        <div class="detail-row"><span class="detail-label">Last Updated</span><span class="detail-value mono">2024-05-30</span></div>
+                        <div class="detail-row"><span class="detail-label">Avg. Pass Rate</span><span class="detail-value mono" id="d-pass">—</span></div>
+                    </div>
+                </div>
+                <div class="exam-cta-row">
+                    <button class="btn-primary" onclick="showPage('pricing')">GET MODULE — VIEW PRICING</button>
+                    <button class="btn-secondary" onclick="showPage('modules')">BROWSE ALL MODULES</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════ STUDY MODULES PAGE -->
+        <div id="page-modules" class="page">
+            <div class="page-header">
+                <div>
+                    <div style="font-family:var(--font-mono);font-size:0.6rem;color:rgba(255,255,255,0.35);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.1em;">ALL AGENCIES</div>
+                    <h2>Study Modules</h2>
+                </div>
+                <div class="page-sys">
+                    <span>6 MODULES AVAILABLE</span>
+                    <span>UPDATED MAY 2024</span>
+                </div>
+            </div>
+            <div class="page-body">
+                <div class="section-label" style="margin-bottom:1.5rem;">Available prep modules</div>
+                <div class="modules-grid">
+                    <div class="module-card" onclick="showExamDetail('4022','DSNY','Sanitation Worker','2024-06-15','OPEN')">
+                        <div class="module-agency">DSNY — Exam #4022</div>
+                        <div class="module-title">Sanitation Worker</div>
+                        <div class="module-meta">Covers written exam components, physical agility benchmarks, and route knowledge for NYC sanitation operations.</div>
+                        <div class="module-stats">
+                            <div class="module-stat"><span class="module-stat-val">420</span><span class="module-stat-label">Questions</span></div>
+                            <div class="module-stat"><span class="module-stat-val">8</span><span class="module-stat-label">Practice Tests</span></div>
+                            <div class="module-stat"><span class="module-stat-val">82%</span><span class="module-stat-label">Pass Rate</span></div>
+                        </div>
+                        <div class="module-bar"><div class="module-bar-fill" style="width:82%"></div></div>
+                        <div class="module-progress-label">Student avg. pass rate</div>
+                    </div>
+                    <div class="module-card" onclick="showExamDetail('4310','FDNY','Firefighter (Open Competitive)','2024-07-01','OPEN')">
+                        <div class="module-agency">FDNY — Exam #4310</div>
+                        <div class="module-title">Firefighter</div>
+                        <div class="module-meta">Full prep for the Firefighter exam including reading comprehension, mechanical aptitude, spatial orientation, and memory recall.</div>
+                        <div class="module-stats">
+                            <div class="module-stat"><span class="module-stat-val">680</span><span class="module-stat-label">Questions</span></div>
+                            <div class="module-stat"><span class="module-stat-val">12</span><span class="module-stat-label">Practice Tests</span></div>
+                            <div class="module-stat"><span class="module-stat-val">79%</span><span class="module-stat-label">Pass Rate</span></div>
+                        </div>
+                        <div class="module-bar"><div class="module-bar-fill" style="width:79%"></div></div>
+                        <div class="module-progress-label">Student avg. pass rate</div>
+                    </div>
+                    <div class="module-card" onclick="showExamDetail('4099','NYPD','Police Officer','CONTINUOUS','CONTINUOUS')">
+                        <div class="module-agency">NYPD — Exam #4099</div>
+                        <div class="module-title">Police Officer</div>
+                        <div class="module-meta">Comprehensive police officer exam prep: logic, reading comprehension, situational judgment, and law enforcement scenarios.</div>
+                        <div class="module-stats">
+                            <div class="module-stat"><span class="module-stat-val">750</span><span class="module-stat-label">Questions</span></div>
+                            <div class="module-stat"><span class="module-stat-val">15</span><span class="module-stat-label">Practice Tests</span></div>
+                            <div class="module-stat"><span class="module-stat-val">88%</span><span class="module-stat-label">Pass Rate</span></div>
+                        </div>
+                        <div class="module-bar"><div class="module-bar-fill" style="width:88%"></div></div>
+                        <div class="module-progress-label">Student avg. pass rate</div>
+                    </div>
+                    <div class="module-card" onclick="showExamDetail('4061','MTA','Train Operator','2024-06-22','OPEN')">
+                        <div class="module-agency">MTA — Exam #4061</div>
+                        <div class="module-title">Train Operator</div>
+                        <div class="module-meta">MTA-specific prep covering signal recognition, track safety, reading train orders, customer communication, and emergency protocols.</div>
+                        <div class="module-stats">
+                            <div class="module-stat"><span class="module-stat-val">510</span><span class="module-stat-label">Questions</span></div>
+                            <div class="module-stat"><span class="module-stat-val">10</span><span class="module-stat-label">Practice Tests</span></div>
+                            <div class="module-stat"><span class="module-stat-val">76%</span><span class="module-stat-label">Pass Rate</span></div>
+                        </div>
+                        <div class="module-bar"><div class="module-bar-fill" style="width:76%"></div></div>
+                        <div class="module-progress-label">Student avg. pass rate</div>
+                    </div>
+                    <div class="module-card" onclick="showExamDetail('5012','DEP','Water Treatment Operator','2024-07-15','OPEN')">
+                        <div class="module-agency">DEP — Exam #5012</div>
+                        <div class="module-title">Water Treatment Operator</div>
+                        <div class="module-meta">DEP exam prep covering water chemistry, plant operations, environmental regulations, and equipment maintenance procedures.</div>
+                        <div class="module-stats">
+                            <div class="module-stat"><span class="module-stat-val">380</span><span class="module-stat-label">Questions</span></div>
+                            <div class="module-stat"><span class="module-stat-val">7</span><span class="module-stat-label">Practice Tests</span></div>
+                            <div class="module-stat"><span class="module-stat-val">74%</span><span class="module-stat-label">Pass Rate</span></div>
+                        </div>
+                        <div class="module-bar"><div class="module-bar-fill" style="width:74%"></div></div>
+                        <div class="module-progress-label">Student avg. pass rate</div>
+                    </div>
+                    <div class="module-card" onclick="showExamDetail('5044','DOT','Highway Repairer','2024-08-01','UPCOMING')">
+                        <div class="module-agency">DOT — Exam #5044</div>
+                        <div class="module-title">Highway Repairer</div>
+                        <div class="module-meta">DOT prep covering road maintenance principles, materials identification, safety regulations, and equipment operation knowledge.</div>
+                        <div class="module-stats">
+                            <div class="module-stat"><span class="module-stat-val">290</span><span class="module-stat-label">Questions</span></div>
+                            <div class="module-stat"><span class="module-stat-val">6</span><span class="module-stat-label">Practice Tests</span></div>
+                            <div class="module-stat"><span class="module-stat-val">80%</span><span class="module-stat-label">Pass Rate</span></div>
+                        </div>
+                        <div class="module-bar"><div class="module-bar-fill" style="width:80%"></div></div>
+                        <div class="module-progress-label">Student avg. pass rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════ PRICING PAGE -->
+        <div id="page-pricing" class="page">
+            <div class="page-header">
+                <div>
+                    <div style="font-family:var(--font-mono);font-size:0.6rem;color:rgba(255,255,255,0.35);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.1em;">PLANS & PRICING</div>
+                    <h2>Module Pricing</h2>
+                </div>
+                <div class="page-sys">
+                    <span>3 TIERS AVAILABLE</span>
+                    <span>7-DAY MONEY BACK</span>
+                </div>
+            </div>
+            <div class="page-body">
+
+                <div class="section-label">Billing cycle</div>
+                <div class="pricing-toggle-row">
+                    <span class="pricing-toggle-label">Monthly</span>
+                    <div class="toggle-track" id="billing-toggle" onclick="toggleBilling()">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                    <span class="pricing-toggle-label">Annual</span>
+                    <span class="save-badge">SAVE 20%</span>
+                </div>
+
+                <div class="section-label">Plans</div>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <div class="pricing-badge">Starter</div>
+                        <div class="pricing-plan">Basic</div>
+                        <div class="pricing-amount" id="p-basic">$19</div>
+                        <div class="pricing-unit">/ mo</div>
+                        <div class="pricing-note" id="n-basic">Billed monthly</div>
+                        <ul class="pricing-features">
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>1 agency module</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>200-question bank</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>3 timed practice exams</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>Score tracking</li>
+                            <li class="pricing-feature"><span class="feat-no">✗</span><span style="color:rgba(255,255,255,0.25)">Study guides</span></li>
+                            <li class="pricing-feature"><span class="feat-no">✗</span><span style="color:rgba(255,255,255,0.25)">Physical agility prep</span></li>
+                            <li class="pricing-feature"><span class="feat-no">✗</span><span style="color:rgba(255,255,255,0.25)">Instructor Q&amp;A</span></li>
+                        </ul>
+                        <button class="pricing-cta">Select Basic</button>
+                    </div>
+                    <div class="pricing-card featured">
+                        <div class="pricing-badge">Most Popular</div>
+                        <div class="pricing-plan">Standard</div>
+                        <div class="pricing-amount" id="p-standard">$39</div>
+                        <div class="pricing-unit">/ mo</div>
+                        <div class="pricing-note" id="n-standard">Billed monthly</div>
+                        <ul class="pricing-features">
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>3 agency modules</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>800-question bank</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>Unlimited practice exams</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>Score tracking + analytics</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>Downloadable study guides</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>Physical agility prep</li>
+                            <li class="pricing-feature"><span class="feat-no">✗</span><span style="color:rgba(255,255,255,0.4)">Instructor Q&amp;A</span></li>
+                        </ul>
+                        <button class="pricing-cta">Select Standard</button>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="pricing-badge">All Access</div>
+                        <div class="pricing-plan">Elite</div>
+                        <div class="pricing-amount" id="p-elite">$69</div>
+                        <div class="pricing-unit">/ mo</div>
+                        <div class="pricing-note" id="n-elite">Billed monthly</div>
+                        <ul class="pricing-features">
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>All 6 agency modules</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>2,000+ question bank</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>Unlimited practice exams</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>Advanced analytics</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>All study guides + flashcards</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>Physical agility prep</li>
+                            <li class="pricing-feature"><span class="feat-yes">✓</span>Weekly live instructor Q&amp;A</li>
+                        </ul>
+                        <button class="pricing-cta">Select Elite</button>
+                    </div>
+                </div>
+
+                <div class="section-label">Feature comparison</div>
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th class="feat-col" style="width:40%">Feature</th>
+                            <th>Basic</th>
+                            <th style="color:#93c5fd;">Standard</th>
+                            <th>Elite</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Agency modules</td><td class="val">1</td><td class="val">3</td><td class="val">6 (all)</td></tr>
+                        <tr><td>Question bank</td><td class="val">200</td><td class="val">800</td><td class="val">2,000+</td></tr>
+                        <tr><td>Timed practice exams</td><td class="val">3</td><td class="yes">Unlimited</td><td class="yes">Unlimited</td></tr>
+                        <tr><td>Score tracking</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                        <tr><td>Performance analytics</td><td class="no">—</td><td class="val">Basic</td><td class="val">Advanced</td></tr>
+                        <tr><td>Study guides (PDF)</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓ + flashcards</td></tr>
+                        <tr><td>Physical agility prep</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                        <tr><td>Instructor Q&amp;A</td><td class="no">—</td><td class="no">—</td><td class="yes">Weekly live</td></tr>
+                        <tr><td>Module updates</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">Priority</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="section-label">Bundle add-ons</div>
+                <div class="addons-grid" style="margin-bottom:2rem;">
+                    <div class="addon-card">
+                        <div class="addon-title">Physical Agility Booster</div>
+                        <div class="addon-desc">Video walkthroughs of all PAT components, fitness benchmarks by agency, and a 6-week conditioning schedule.</div>
+                        <div class="addon-price">$12</div>
+                        <div class="addon-price-note">/ mo add-on</div>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-title">Background Check Prep Kit</div>
+                        <div class="addon-desc">Comprehensive guide to the background investigation process, character interview coaching, and document checklist.</div>
+                        <div class="addon-price">$24</div>
+                        <div class="addon-price-note">one-time</div>
+                    </div>
+                    <div class="addon-card">
+                        <div class="addon-title">1-on-1 Coaching Session</div>
+                        <div class="addon-desc">60-minute private session with a civil service exam specialist. Personalized study plan and career pathway guidance.</div>
+                        <div class="addon-price">$89</div>
+                        <div class="addon-price-note">per session</div>
+                    </div>
+                </div>
+
+                <div class="section-label">Common questions</div>
+                <div class="faq-list">
+                    <div class="faq-item"><div class="faq-q">Can I switch plans at any time?</div><div class="faq-a">Yes. Upgrades take effect immediately and are prorated. Downgrades take effect at the next billing cycle.</div></div>
+                    <div class="faq-item"><div class="faq-q">How long do I have access after subscribing?</div><div class="faq-a">Access is active for the full duration of your subscription. Monthly plans renew each month; annual plans lock in your rate for 12 months.</div></div>
+                    <div class="faq-item"><div class="faq-q">Are the question banks updated when exams change?</div><div class="faq-a">Yes. Our editorial team monitors DCAS announcements and updates module content within 72 hours of any official exam notice or notice of exam (NOE).</div></div>
+                    <div class="faq-item"><div class="faq-q">Do you offer refunds?</div><div class="faq-a">We offer a 7-day money-back guarantee on all plans. Contact support within 7 days of your first charge for a full refund.</div></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="frame-bar">
+        <span>UNAUTHORIZED ACCESS PROHIBITED</span>
+        <span>MAINTAINED BY DEPT. OF EXAM PREPARATION</span>
+        <span>06 OF 07</span>
+    </div>
+</div>
+
+<script>
+    /* ── EXAM DATA ── */
+    const examData = {
+        '4022': { salary: '$44,882 – $78,455', edu: 'High School Diploma or GED', exp: 'None required', lic: 'Valid Class B CDL (within 1 year)', age: '17.5+ at time of filing', topics: ['Reading Comprehension','Memory & Observation','Mathematical Reasoning','Spatial Orientation','Work Habits & Practices'], qcount: '420', videos: '14 video guides', pass: '82%' },
+        '4061': { salary: '$54,018 – $89,441', edu: 'High School Diploma or GED', exp: 'None required', lic: 'Valid NYS Driver\'s License', age: '18+ at time of exam', topics: ['Train & Signal Recognition','Reading Train Orders','Customer Service Scenarios','Safety & Emergency Protocols','Basic Mechanical Knowledge'], qcount: '510', videos: '11 video guides', pass: '76%' },
+        '4310': { salary: '$57,000 – $94,000', edu: 'High School Diploma or GED', exp: 'None required', lic: 'Valid NYS Driver\'s License', age: '17.5+ at filing / 21 at appointment', topics: ['Reading Comprehension','Deductive Reasoning','Spatial Orientation','Mechanical Aptitude','Memory Recall','Written Expression'], qcount: '680', videos: '18 video guides', pass: '79%' },
+        '4099': { salary: '$42,500 – $85,292', edu: 'High School Diploma or GED', exp: 'None required', lic: 'Valid NYS Driver\'s License', age: '17.5+ at time of filing', topics: ['Reading & Writing','Logical Reasoning','Situational Judgment','Spatial Orientation','Memorization','Police Ethics & Law'], qcount: '750', videos: '20 video guides', pass: '88%' },
+        '5012': { salary: '$49,000 – $72,000', edu: 'High School Diploma or GED + 30 credits science preferred', exp: '1 year water/wastewater preferred', lic: 'Valid NYS Driver\'s License', age: '18+ at time of exam', topics: ['Water Chemistry Basics','Plant Operations','Environmental Regulations','Equipment Maintenance','Math & Measurement'], qcount: '380', videos: '9 video guides', pass: '74%' },
+        '5044': { salary: '$38,000 – $60,000', edu: 'High School Diploma or GED', exp: 'None required', lic: 'Valid NYS Driver\'s License', age: '18+ at time of exam', topics: ['Reading & Following Instructions','Material Identification','Road Safety Regulations','Basic Math','Equipment Operation Knowledge'], qcount: '290', videos: '7 video guides', pass: '80%' },
+        '6011': { salary: '$35,000 – $52,000', edu: 'High School Diploma or GED', exp: '1 year clerical experience preferred', lic: 'None required', age: '18+ at time of exam', topics: ['Clerical Operations','Business Math','Record Keeping','Word Processing Concepts','Customer Communication'], qcount: '220', videos: '5 video guides', pass: '85%' }
+    };
+
+    /* ── NAVIGATION ── */
+    function showPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+        document.getElementById('page-' + page).classList.add('active');
+        const navMap = { home: 'nav-home', modules: 'nav-modules', pricing: 'nav-pricing', detail: 'nav-home' };
+        if (navMap[page]) document.getElementById(navMap[page]).classList.add('active');
+    }
+
+    /* ── EXAM DETAIL ── */
+    function showExamDetail(num, agency, title, deadline, status) {
+        const d = examData[num] || {};
+        document.getElementById('detail-title').textContent = title;
+        document.getElementById('detail-exam-no').textContent = 'EXAM NO. ' + num;
+        document.getElementById('detail-agency-pill').textContent = agency + ' AGENCY';
+        const pill = document.getElementById('detail-status-pill');
+        pill.textContent = status;
+        pill.className = 'status-pill ' + (status === 'CONTINUOUS' ? 'continuous' : 'open');
+        document.getElementById('d-num').textContent = num;
+        document.getElementById('d-agency').textContent = agency;
+        document.getElementById('d-deadline').textContent = deadline;
+        document.getElementById('d-salary').textContent = d.salary || '—';
+        document.getElementById('d-status-inline').textContent = status;
+        document.getElementById('d-edu').textContent = d.edu || '—';
+        document.getElementById('d-exp').textContent = d.exp || '—';
+        document.getElementById('d-lic').textContent = d.lic || '—';
+        document.getElementById('d-age').textContent = d.age || '—';
+        document.getElementById('d-qcount').textContent = d.qcount || '—';
+        document.getElementById('d-videos').textContent = d.videos || '—';
+        document.getElementById('d-pass').textContent = d.pass || '—';
+        const topicList = document.getElementById('d-topics');
+        topicList.innerHTML = '';
+        (d.topics || []).forEach(t => {
+            const li = document.createElement('li');
+            li.textContent = t;
+            topicList.appendChild(li);
+        });
+        showPage('detail');
+    }
+
+    /* ── FILTERS ── */
+    let activeAgency = 'ALL';
+    let activeStatus = 'ALL';
+
+    document.querySelectorAll('#agency-filters .filter-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('#agency-filters .filter-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            activeAgency = item.dataset.agency;
+            applyFilters();
+        });
+    });
+
+    document.querySelectorAll('#status-filters .filter-item').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('#status-filters .filter-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            activeStatus = item.dataset.status;
+            applyFilters();
+        });
+    });
+
+    document.getElementById('search-input').addEventListener('input', applyFilters);
+
+    function applyFilters() {
+        const query = document.getElementById('search-input').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.data-row');
+        let visible = 0;
+        rows.forEach(row => {
+            const agency = row.dataset.agency;
+            const status = row.dataset.status;
+            const text = row.textContent.toLowerCase();
+            const agencyMatch = activeAgency === 'ALL' || agency === activeAgency;
+            const statusMatch = activeStatus === 'ALL' || status === activeStatus;
+            const searchMatch = !query || text.includes(query);
+            if (agencyMatch && statusMatch && searchMatch) {
+                row.classList.remove('hidden');
+                visible++;
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+        document.getElementById('no-results').style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    /* ── PRICING TOGGLE ── */
+    let billingAnnual = false;
+    const prices = { basic: [19, 15], standard: [39, 31], elite: [69, 55] };
+    const notes = { basic: ['Billed monthly', 'Billed $182/yr — save $46'], standard: ['Billed monthly', 'Billed $372/yr — save $96'], elite: ['Billed monthly', 'Billed $660/yr — save $168'] };
+
+    function toggleBilling() {
+        billingAnnual = !billingAnnual;
+        const track = document.getElementById('billing-toggle');
+        track.classList.toggle('on', billingAnnual);
+        Object.keys(prices).forEach(k => {
+            document.getElementById('p-' + k).textContent = '$' + prices[k][billingAnnual ? 1 : 0];
+            document.getElementById('n-' + k).textContent = notes[k][billingAnnual ? 1 : 0];
+        });
+    }
+</script>
+</body>
+</html>
